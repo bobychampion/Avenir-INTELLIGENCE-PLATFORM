@@ -1,0 +1,117 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    // Shared Global Validation Primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    function isValidId(id) {
+       return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        request.auth.token.email == 'jabpa87@gmail.com'
+      );
+    }
+    
+    function incoming() {
+      return request.resource.data;
+    }
+    
+    function existing() {
+      return resource.data;
+    }
+
+    // 1. User Profile validation helper
+    function isValidUser(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.username is string && data.username.size() >= 2 && data.username.size() <= 200 &&
+             data.email is string && data.email.size() <= 256 &&
+             data.role is string && (data.role == "member" || data.role == "admin") &&
+             data.createdAt is timestamp;
+    }
+
+    // 2. Assessment log validation helper
+    function isValidAssessment(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.userId is string && data.userId.size() <= 128 &&
+             data.type is string && (data.type == "quick" || data.type == "full") &&
+             data.responses is list && data.responses.size() <= 120 &&
+             data.scores is map &&
+             data.createdAt is timestamp;
+    }
+
+    // 3. AIReport dossier validation helper
+    function isValidReport(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.assessmentId is string && data.assessmentId.size() <= 128 &&
+             data.userId is string && data.userId.size() <= 128 &&
+             data.personalSummary is string && data.personalSummary.size() <= 10000 &&
+             data.strengths is list && data.strengths.size() <= 10 &&
+             data.weaknesses is list && data.weaknesses.size() <= 10 &&
+             data.workStyle is string && data.workStyle.size() <= 10000 &&
+             data.careerSuggestions is list && data.careerSuggestions.size() <= 10 &&
+             data.growthRecommendations is list && data.growthRecommendations.size() <= 15 &&
+             data.createdAt is timestamp;
+    }
+
+    // Resource Paths Rules
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      
+      allow create: if isOwner(userId) && 
+                      isValidId(userId) && 
+                      isValidUser(incoming()) && 
+                      incoming().id == userId &&
+                      incoming().createdAt == request.time &&
+                      incoming().role == "member";
+                      
+      allow update: if isOwner(userId) && 
+                      isValidUser(incoming()) && 
+                      incoming().id == existing().id &&
+                      incoming().createdAt == existing().createdAt &&
+                      incoming().role == existing().role &&
+                      incoming().diff(existing()).affectedKeys().hasOnly(['username', 'ageRange', 'country', 'profession']);
+                      
+      allow delete: if isAdmin();
+
+      match /assessments/{assessmentId} {
+        allow get, list: if isOwner(userId) || isAdmin();
+        
+        allow create: if isOwner(userId) && 
+                        isValidId(assessmentId) && 
+                        isValidAssessment(incoming()) && 
+                        incoming().userId == userId &&
+                        incoming().createdAt == request.time;
+                        
+        allow update, delete: if false; // immutable history entries
+      }
+
+      match /reports/{reportId} {
+        allow get, list: if isOwner(userId) || isAdmin();
+        
+        allow create: if isOwner(userId) && 
+                        isValidId(reportId) && 
+                        isValidReport(incoming()) && 
+                        incoming().userId == userId &&
+                        incoming().createdAt == request.time;
+                        
+        allow update, delete: if false; // report records remain immutable
+      }
+    }
+  }
+}

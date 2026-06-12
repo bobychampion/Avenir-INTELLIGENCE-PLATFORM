@@ -1,0 +1,6 @@
+{
+  "name": "Avenir Potential",
+  "description": "Avenir Human Intelligence & Potential Assessment Platform is a comprehensive assessment tool analyzing cognitive abilities, emotional quotient, communication skills, personality, and leadership profile.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,144 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User account registration and demographic information",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique Firebase UID of the authenticated user"
+        },
+        "username": {
+          "type": "string",
+          "description": "Display name or full name of the candidate"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Primary communication address for the profile"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["member", "admin"],
+          "description": "Access level identifier for system administration"
+        },
+        "ageRange": {
+          "type": "string",
+          "description": "Candidate demographic age bucket"
+        },
+        "country": {
+          "type": "string",
+          "description": "Candidate country of residence/citizenship"
+        },
+        "profession": {
+          "type": "string",
+          "description": "Candidate primary professional title"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Session creation timestamp"
+        }
+      },
+      "required": ["id", "username", "email", "role", "createdAt"]
+    },
+    "Assessment": {
+      "title": "Candidate Assessment",
+      "description": "Record of assessment responses and metrics",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this assessment"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user account UID"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["quick", "full"],
+          "description": "Length and scope category of the test"
+        },
+        "responses": {
+          "type": "array",
+          "description": "Complete list of answers and scores"
+        },
+        "scores": {
+          "type": "object",
+          "description": "Computed final percentages per standard index"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Completion and submission server time"
+        }
+      },
+      "required": ["id", "userId", "type", "responses", "scores", "createdAt"]
+    },
+    "AIReport": {
+      "title": "Psychometric AI Report",
+      "description": "The AI-generated cognitive feedback dossier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Dossier verification code/ID"
+        },
+        "assessmentId": {
+          "type": "string",
+          "description": "Associated assessment reference"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Target profile UID"
+        },
+        "personalSummary": {
+          "type": "string",
+          "description": "Overall developmental executive summary"
+        },
+        "strengths": {
+          "type": "array",
+          "description": "Detailed bulleted list of 3 key strengths"
+        },
+        "weaknesses": {
+          "type": "array",
+          "description": "Detailed bulleted list of 2 blindspots"
+        },
+        "workStyle": {
+          "type": "string",
+          "description": "Operating alignment inside shared workplaces"
+        },
+        "careerSuggestions": {
+          "type": "array",
+          "description": "Targeted pathways recommendations and suitabilities"
+        },
+        "growthRecommendations": {
+          "type": "array",
+          "description": "Actionable development and educational actions/courses"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Report compilation timestamp"
+        }
+      },
+      "required": ["id", "assessmentId", "userId", "personalSummary", "strengths", "weaknesses", "workStyle", "careerSuggestions", "growthRecommendations", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Information storage bucket for Avenir profiles"
+    },
+    "/users/{userId}/assessments/{assessmentId}": {
+      "schema": "Assessment",
+      "description": "List of assessments submitted by this candidate"
+    },
+    "/users/{userId}/reports/{reportId}": {
+      "schema": "AIReport",
+      "description": "Durable dossiers compiled for completed assessments"
+    }
+  }
+}
