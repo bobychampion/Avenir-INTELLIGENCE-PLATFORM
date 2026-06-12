@@ -6,6 +6,8 @@
 import express from "express";
 import path from "path";
 import dotenv from "dotenv";
+import { initializeApp, applicationDefault } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
 import { GoogleGenAI, Type } from "@google/genai";
 import { createServer as createViteServer } from "vite";
 
@@ -13,7 +15,19 @@ import { createServer as createViteServer } from "vite";
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+
+let db = null;
+try {
+  const firebaseAdminApp = initializeApp({
+    credential: applicationDefault(),
+    projectId: process.env.FIREBASE_PROJECT_ID || "avenir-potential"
+  });
+  db = getFirestore(firebaseAdminApp);
+  console.log("Firebase Admin / Firestore initialized successfully.");
+} catch (err) {
+  console.warn("Firestore initialization skipped:", err);
+}
 
 app.use(express.json({ limit: "50mb" }));
 
@@ -183,16 +197,73 @@ Make sure to deliver high fidelity and actionable advice.
       }
     });
 
+    let parsedData: any;
     if (response && response.text) {
-      const parsedData = JSON.parse(response.text.trim());
-      return res.json(parsedData);
+      parsedData = JSON.parse(response.text.trim());
     } else {
       console.warn("Empty response text from Gemini API. Engaging fallback.");
-      return res.json(generateStaticReport());
+      parsedData = generateStaticReport();
     }
+
+    const assessmentId = "a_" + Math.random().toString(36).substr(2, 9);
+    const reportId = "report_" + Math.random().toString(36).substr(2, 9);
+    const now = new Date().toISOString();
+
+    const assessmentDoc = {
+      id: assessmentId,
+      userId: name || "anon",
+      type,
+      status: "completed",
+      responses,
+      scores,
+      completed_date: now
+    };
+
+    const reportDoc = {
+      ...parsedData,
+      id: reportId,
+      assessment_id: assessmentId,
+      created_date: now
+    };
+
+    if (db) {
+      try {
+        await db.collection("assessments").doc(assessmentId).set(assessmentDoc);
+        await db.collection("reports").doc(reportId).set(reportDoc);
+      } catch (firestoreErr) {
+        console.error("Failed to persist assessment/report to Firestore:", firestoreErr);
+      }
+    }
+
+    return res.json(parsedData);
   } catch (err) {
     console.error("Error during Gemini API generation:", err);
-    return res.json(generateStaticReport());
+    const fallback = generateStaticReport();
+    if (db) {
+      try {
+        const fallbackAssessmentId = "a_" + Math.random().toString(36).substr(2, 9);
+        const fallbackReportId = "report_" + Math.random().toString(36).substr(2, 9);
+        const fallbackNow = new Date().toISOString();
+        await db.collection("assessments").doc(fallbackAssessmentId).set({
+          id: fallbackAssessmentId,
+          userId: name || "anon",
+          type,
+          status: "completed",
+          responses,
+          scores,
+          completed_date: fallbackNow
+        });
+        await db.collection("reports").doc(fallbackReportId).set({
+          ...fallback,
+          id: fallbackReportId,
+          assessment_id: fallbackAssessmentId,
+          created_date: fallbackNow
+        });
+      } catch (firestoreErr) {
+        console.error("Failed to persist fallback assessment/report to Firestore:", firestoreErr);
+      }
+    }
+    return res.json(fallback);
   }
 });
 
@@ -320,6 +391,117 @@ app.post("/api/generate-journey-image", async (req, res) => {
   } catch (err) {
     console.error("General error during Gemini image generation:", err);
     return res.json({ imageUrl: generateFallbackImage() });
+  }
+});
+
+// Persist journey image generation metadata
+app.post("/api/save-image-generation", async (req, res) => {
+  const { profession, style, customPrompt, userId, imageUrl } = req.body || {};
+
+  if (!profession || !style) {
+    return res.status(400).json({ error: "Missing profession or style parameters." });
+  }
+
+  const record = {
+    userId: userId || "anon",
+    profession,
+    style,
+    customPrompt: customPrompt || "",
+    imageUrl: imageUrl || null,
+    created_at: new Date().toISOString()
+  };
+
+  if (!db) {
+    return res.status(200).json({ saved: false, reason: "Firestore not initialized" });
+  }
+
+  try {
+    const docRef = await db.collection("image_generations").add(record);
+    return res.status(201).json({ id: docRef.id, saved: true });
+  } catch (firestoreErr) {
+    console.error("Failed to persist image generation:", firestoreErr);
+    return res.status(500).json({ error: "Failed to persist image generation" });
+  }
+});
+
+// Persist user registration/auth data
+app.post("/api/save-user", async (req, res) => {
+  const { id, name, email, role, created_at, age_range, profession, country } = req.body || {};
+
+  if (!id || !email) {
+    return res.status(400).json({ error: "Missing required user fields." });
+  }
+
+  if (!db) {
+    return res.status(200).json({ saved: false, reason: "Firestore not initialized" });
+  }
+
+  try {
+    const batch = db.batch();
+    batch.set(db.collection("users").doc(id), {
+      id,
+      name: name || "",
+      email,
+      role: role || "member",
+      created_at: created_at || new Date().toISOString()
+    });
+    batch.set(db.collection("profiles").doc(id), {
+      user_id: id,
+      age_range: age_range || "",
+      profession: profession || "",
+      country: country || ""
+    });
+    await batch.commit();
+    return res.status(201).json({ saved: true, user: id });
+  } catch (firestoreErr) {
+    console.error("Failed to persist user:", firestoreErr);
+    return res.status(500).json({ error: "Failed to persist user" });
+  }
+});
+
+// Persist admin questions
+app.post("/api/admin/questions", async (req, res) => {
+  const { id, category, text, subsection, context, options, isEditing, existingId } = req.body || {};
+
+  if (!category || !text || !context || !options || !Array.isArray(options)) {
+    return res.status(400).json({ error: "Missing required question fields." });
+  }
+
+  if (!db) {
+    return res.status(200).json({ saved: false, reason: "Firestore not initialized" });
+  }
+
+  try {
+    const docId = isEditing && existingId ? existingId : "q_admin_" + Math.random().toString(36).substr(2, 9);
+    await db.collection("admin_questions").doc(docId).set({
+      id: docId,
+      category,
+      text,
+      subsection: subsection || null,
+      context,
+      options,
+      updated_at: new Date().toISOString()
+    });
+    return res.status(201).json({ saved: true, id: docId });
+  } catch (firestoreErr) {
+    console.error("Failed to persist question:", firestoreErr);
+    return res.status(500).json({ error: "Failed to persist question" });
+  }
+});
+
+app.delete("/api/admin/questions/:id", async (req, res) => {
+  const { id } = req.params;
+
+  if (!db) {
+    return res.status(200).json({ deleted: false, reason: "Firestore not initialized" });
+  }
+
+  try {
+    await db.collection("admin_questions").doc(id).delete();
+    return res.status(200).json({ deleted: true, id });
+  } catch (firestoreErr) {
+    console.error("Failed to delete question:", firestoreErr);
+    return res.status(500).json({ error: "Failed to delete question" });
   }
 });
 

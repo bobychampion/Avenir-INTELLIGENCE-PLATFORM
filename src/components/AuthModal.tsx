@@ -47,8 +47,31 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = "r
       country: country
     };
 
+    const registerRequest = fetch("/api/save-user", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: simulatedUser.id,
+        name: simulatedUser.name,
+        email: simulatedUser.email,
+        role: simulatedUser.role,
+        created_at: simulatedUser.created_at,
+        age_range: ageRange,
+        profession,
+        country
+      })
+    }).catch(() => null);
+
     onSuccess(simulatedUser, simulatedProfile, mode === "login");
     onClose();
+
+    if (registerRequest) {
+      registerRequest.then(res => {
+        if (!res || !res.ok) {
+          console.warn("User persistence to Firestore did not complete successfully.");
+        }
+      }).catch(() => {});
+    }
   };
 
   return (
