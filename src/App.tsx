@@ -14,6 +14,7 @@ import ReportView from "./components/ReportView";
 import Dashboard from "./components/Dashboard";
 import AdminPanel from "./components/AdminPanel";
 import AdminGateway from "./components/AdminGateway";
+import { generateReportClientSide } from "./lib/geminiFallback";
 
 export default function App() {
   const { addToast } = useToast();
@@ -206,12 +207,33 @@ export default function App() {
       }
     });
 
-    // 2. Invoke local Express server-side endpoint proxying the Gemini API
+    // 2. Invoke local Express server-side endpoint proxying the Gemini API, with client-side fallback
     try {
-      const response = await fetch("/api/generate-report", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      let reportData: any;
+      
+      try {
+        const response = await fetch("/api/generate-report", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: user?.name || "Anonymous Friend",
+            ageRange: profile?.age_range || "Not specified",
+            country: profile?.country || "Not specified",
+            profession: profile?.profession || "Not specified",
+            type: activeTestType,
+            responses: responses,
+            scores: calculatedScores
+          })
+        });
+
+        const text = await response.text();
+        if (!response.ok || text.trim().startsWith("<")) {
+          throw new Error("Local server reported 404 or page fallback (Netlify redirection).");
+        }
+        reportData = JSON.parse(text);
+      } catch (innerErr) {
+        console.log("Using browser-side dynamic Gemini client fallback for static hosting/Netlify environments...", innerErr);
+        reportData = await generateReportClientSide({
           name: user?.name || "Anonymous Friend",
           ageRange: profile?.age_range || "Not specified",
           country: profile?.country || "Not specified",
@@ -219,10 +241,9 @@ export default function App() {
           type: activeTestType,
           responses: responses,
           scores: calculatedScores
-        })
-      });
+        });
+      }
 
-      const reportData: AIReport = await response.json();
       clearInterval(timer);
 
       // Create history record

@@ -25,6 +25,7 @@ import {
 import realEstateImg from "../assets/images/real_estate_developer_abstract_1781284387487.jpg";
 import agritechImg from "../assets/images/agritech_logistics_abstract_1781284404163.jpg";
 import architectImg from "../assets/images/architect_surveyor_abstract_1781284419659.jpg";
+import { generateFallbackImageClientSide } from "../lib/geminiFallback";
 
 interface LandingPageProps {
   onStartQuick: () => void;
@@ -89,21 +90,37 @@ export default function LandingPage({
     setIsGenerating(true);
     setGenerationError(null);
     try {
-      const response = await fetch("/api/generate-journey-image", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          profession: genProfession,
-          style: genStyle,
-          customPrompt: customPrompt
-        })
-      });
-      if (!response.ok) {
-        throw new Error("Dynamic imagery server-side handler reported an unexpected status.");
+      let imageUrl: string | null = null;
+      
+      try {
+        const response = await fetch("/api/generate-journey-image", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            profession: genProfession,
+            style: genStyle,
+            customPrompt: customPrompt
+          })
+        });
+        
+        const text = await response.text();
+        if (!response.ok || text.trim().startsWith("<")) {
+          throw new Error("Endpoint returned an HTML error page or 404.");
+        }
+        
+        const data = JSON.parse(text);
+        if (data && data.imageUrl) {
+          imageUrl = data.imageUrl;
+        } else {
+          throw new Error("Invalid payload design returned from image api.");
+        }
+      } catch (innerErr) {
+        console.log("No dynamic node-server container found (Netlify static deployment mode). Generating premium client-side vector art dynamically.", innerErr);
+        imageUrl = generateFallbackImageClientSide(genProfession, genStyle);
       }
-      const data = await response.json();
-      if (data && data.imageUrl) {
-        setGeneratedImgUrl(data.imageUrl);
+
+      if (imageUrl) {
+        setGeneratedImgUrl(imageUrl);
         setGenerationLog(prev => [
           {
             prompt: customPrompt || `A professional dynamic artwork showcasing ${genProfession}`,
@@ -113,7 +130,7 @@ export default function LandingPage({
           ...prev
         ]);
       } else {
-        throw new Error("No abstract image payload decoded from service response.");
+        throw new Error("Failed to produce static or generative travel imagery.");
       }
     } catch (err: any) {
       console.error(err);
