@@ -196,6 +196,133 @@ Make sure to deliver high fidelity and actionable advice.
   }
 });
 
+// Journey dynamic abstract image generator endpoint
+app.post("/api/generate-journey-image", async (req, res) => {
+  const { profession, style, customPrompt } = req.body;
+
+  if (!profession || !style) {
+    return res.status(400).json({ error: "Missing profession or style parameters." });
+  }
+
+  const prompt = `A modern abstract artwork representing a '${profession}' success journey. Style: ${style}. ${customPrompt || ""}. Elegant lines, structured shapes, rich color accents, minimalist design, high contrast, suitable for a professional website header, aspect ratio 16:9.`;
+
+  // Fallback function that returns a beautiful, dynamic, custom SVG image encoded in base64
+  const generateFallbackImage = () => {
+    const colors: Record<string, string[]> = {
+      "Symmetry Blueprint": ["#0f172a", "#1e293b", "#3b82f6", "#60a5fa"],
+      "Futuristic Site Geometry": ["#111827", "#1f2937", "#10b981", "#34d399"],
+      "Warm Editorial Watercolor": ["#451a03", "#78350f", "#b45309", "#fbbf24"],
+      "Warm Organic Clay": ["#064e3b", "#0f766e", "#34d399", "#a7f3d0"],
+    };
+
+    const selectedColors = colors[style] || ["#1e1b4b", "#312e81", "#6366f1", "#818cf8"];
+    const [bg, bgGrad, accent1, accent2] = selectedColors;
+
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+        <defs>
+          <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="${bg}" />
+            <stop offset="100%" stop-color="${bgGrad}" />
+          </linearGradient>
+          <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="${accent1}" opacity="0.8" />
+            <stop offset="100%" stop-color="${accent2}" opacity="0.9" />
+          </linearGradient>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+          </pattern>
+        </defs>
+        
+        <rect width="100%" height="100%" fill="url(#bgGrad)" />
+        <rect width="100%" height="100%" fill="url(#grid)" />
+        
+        <circle cx="650" cy="225" r="300" fill="url(#accentGrad)" filter="blur(60px)" opacity="0.25" />
+        <circle cx="150" cy="350" r="200" fill="${accent1}" filter="blur(40px)" opacity="0.2" />
+
+        <circle cx="400" cy="225" r="160" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2" stroke-dasharray="8 6" />
+        <circle cx="400" cy="225" r="100" fill="none" stroke="${accent1}" stroke-width="1.5" opacity="0.5" />
+        <circle cx="400" cy="225" r="40" fill="none" stroke="${accent2}" stroke-width="3" />
+        
+        <line x1="100" y1="225" x2="700" y2="225" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+        <line x1="400" y1="50" x2="400" y2="400" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+        
+        <line x1="150" y1="50" x2="650" y2="400" stroke="${accent1}" stroke-width="1" opacity="0.3" />
+        <line x1="150" y1="400" x2="650" y2="50" stroke="${accent2}" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.4" />
+        
+        <rect x="50" y="360" width="160" height="40" rx="8" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+        <text x="70" y="384" fill="#ffffff" font-family="monospace" font-size="11" font-weight="bold" letter-spacing="1">COGNITIVE INDEX</text>
+        
+        <rect x="590" y="50" width="160" height="40" rx="8" fill="rgba(81, 102, 241, 0.15)" stroke="rgba(81, 102, 241, 0.3)" stroke-width="1" />
+        <text x="610" y="74" fill="${accent2}" font-family="monospace" font-size="11" font-weight="bold" letter-spacing="1">LEADERSHIP CQ</text>
+
+        <text x="400" y="230" fill="#ffffff" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle" letter-spacing="6" opacity="0.9">GROWTH</text>
+        <path d="M 380 245 L 420 245" stroke="${accent2}" stroke-width="2" />
+      </svg>
+    `;
+
+    return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+  };
+
+  try {
+    if (!ai) {
+      console.warn("No server-side Gemini client available. Deliberately rendering premium fallback SVG.");
+      return res.json({ imageUrl: generateFallbackImage() });
+    }
+
+    console.log("Image Generator using Gemini Model.");
+    
+    try {
+      const response = await ai.models.generateImages({
+        model: "imagen-4.0-generate-001",
+        prompt: prompt,
+        config: {
+          numberOfImages: 1,
+          outputMimeType: "image/jpeg",
+          aspectRatio: "16:9",
+        },
+      });
+
+      if (response && response.generatedImages && response.generatedImages[0]) {
+        const base64EncodeString = response.generatedImages[0].image.imageBytes;
+        const imageUrl = `data:image/png;base64,${base64EncodeString}`;
+        return res.json({ imageUrl: imageUrl });
+      }
+    } catch (errInner) {
+      console.warn("Imagen generation failed or not available, trying gemini-2.5-flash-image fallback...", errInner);
+      
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash-image",
+        contents: {
+          parts: [{ text: prompt }],
+        },
+        config: {
+          imageConfig: {
+            aspectRatio: "16:9",
+          }
+        }
+      });
+
+      if (response && response.candidates && response.candidates[0]?.content?.parts) {
+        for (const part of response.candidates[0].content.parts) {
+          if (part.inlineData) {
+            const base64EncodeString = part.inlineData.data;
+            const imageUrl = `data:image/png;base64,${base64EncodeString}`;
+            return res.json({ imageUrl });
+          }
+        }
+      }
+    }
+
+    console.warn("Both Gemini image pipelines were unavailable (possibly due to API key permissions). Initiating pristine SVG fallback.");
+    return res.json({ imageUrl: generateFallbackImage() });
+
+  } catch (err) {
+    console.error("General error during Gemini image generation:", err);
+    return res.json({ imageUrl: generateFallbackImage() });
+  }
+});
+
 // Configure Vite or Static Assets serving
 async function bootstrapServer() {
   if (process.env.NODE_ENV !== "production") {

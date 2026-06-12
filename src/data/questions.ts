@@ -64,26 +64,26 @@ export const quickQuestions: Question[] = [
     id: "q_cog_5",
     category: AssessmentCategory.COGNITIVE,
     subsection: "Analytical Thinking",
-    text: "You need to evaluate which payment gateway to integrate for your new e-commerce storefront in Nairobi. Your analytical process is:",
+    text: "You need to evaluate which supplier of structural steel to contract for your new apartment build project in Nairobi. Your analytical process is:",
     context: "Business",
     options: [
-      { label: "Compare transaction failure rates, integration latency, payout times, and cross-border currency conversion fees on a weighted matrix.", value: "A", score: 5 },
-      { label: "Choose the one with the trendiest UI because your developer friend recommended it.", value: "B", score: 2 },
-      { label: "Negotiate aggressively with the first vendor that calls you and stick to them.", value: "C", score: 3 },
-      { label: "Build your own payment gateway from scratch to avoid paying 1.5% transaction fees.", value: "D", score: 1 }
+      { label: "Compare tensile test certifications, supply lead times, total delivered cost, and credit terms on a weighted decision matrix.", value: "A", score: 5 },
+      { label: "Choose the vendor with the newest delivery trucks because your subcontractor recommended them casually.", value: "B", score: 2 },
+      { label: "Negotiate aggressively with the first steel merchant that visits your job site and sign with them.", value: "C", score: 3 },
+      { label: "Attempt to melt local iron scraps and cast your own steel rods on-site to save 5% on material costs.", value: "D", score: 1 }
     ]
   },
   {
     id: "q_cog_6",
     category: AssessmentCategory.COGNITIVE,
     subsection: "Logical Reasoning",
-    text: "Three developers state theories on why the payment API handles invalid phone numbers poorly. If Developer A's theory implies Developer B is wrong, how do you resolve it?",
+    text: "Three structural inspectors state theories on why the reinforced concrete foundation is showing minor setting hairline cracks. If Inspector A's theory implies Inspector B is wrong, how do you resolve it?",
     context: "Workplace",
     options: [
-      { label: "Write automated unit tests targeting invalid Kenyans/Nigerian phone number patterns and review the code log directly.", value: "A", score: 5 },
-      { label: "Side with Developer A because they are senior and have more influence in Yaba.", value: "B", score: 1 },
-      { label: "Hold a 2-hour team meeting to debate and vote on whose theory sounds most reasonable.", value: "C", score: 3 },
-      { label: "Throw out the phone validation logic and let users type anything.", value: "D", score: 2 }
+      { label: "Perform independent core sample compression tests, verify water-cement ratio batch logs, and check the structural loads objectively.", value: "A", score: 5 },
+      { label: "Side with Inspector A because they are senior and have been on local Lagos builds longer.", value: "B", score: 1 },
+      { label: "Hold a afternoon-long team meeting to debate and vote on which curing technique seems most reasonable.", value: "C", score: 3 },
+      { label: "Fill the foundation cracks with visual sealant immediately to hide them and keep the site schedule moving.", value: "D", score: 2 }
     ]
   },
 
@@ -172,26 +172,26 @@ export const quickQuestions: Question[] = [
     id: "q_cq_1",
     category: AssessmentCategory.CQ,
     subsection: "Communication Clarity",
-    text: "You receive an email from a manager containing vague instructions like 'Fix the profile fast.' You cannot decode what needs fixing. You:",
+    text: "You receive an email from a project manager containing vague instructions like 'Fix the layout fast.' You cannot decode if they mean the structural floor plan, the parking grid, or the interior dimensions. You:",
     context: "Workplace",
     options: [
-      { label: "Draft a concise list of 3 potential scope points (e.g. bio format, loading speed, photo upload) and ask them to confirm via bullet point reply.", value: "A", score: 5 },
-      { label: "Assume what they meant, change the bio layout, and redeploy it immediately.", value: "B", score: 2 },
-      { label: "Ignore the instruction until they specify exactly what they want in a longer format.", value: "C", score: 1 },
-      { label: "Ask for a quick 2-minute phone call to confirm, taking direct notes during the conversation.", value: "D", score: 4 }
+      { label: "Draft a concise list of 3 potential scope points (e.g., site entrance pathways, parking stall sizes, structural column grids) and ask them to confirm via bullet point reply.", value: "A", score: 5 },
+      { label: "Assume what they meant, change the interior partition wall dimensions, and submit it immediately.", value: "B", score: 2 },
+      { label: "Ignore the instruction until they email you a detailed official CAD file drawing.", value: "C", score: 1 },
+      { label: "Ask for a quick 2-minute phone call to confirm their primary structural layout concern, taking notes.", value: "D", score: 4 }
     ]
   },
   {
     id: "q_cq_2",
     category: AssessmentCategory.CQ,
     subsection: "Listening Ability",
-    text: "During a meeting, a client from Enugu starts rambling about their childhood business ventures before getting to their app requirements. You:",
+    text: "During a meeting, a client from Enugu starts rambling about their childhood business ventures before getting to their warehouse construction design requirements. You:",
     context: "Business",
     options: [
       { label: "Listen actively, find the underlying entrepreneurial values they highly respect, then weave those themes into your technical proposal.", value: "A", score: 5 },
       { label: "Interrupt them politely and remind them that time is short and we need to stick to the spec sheet.", value: "B", score: 2 },
       { label: "Nod but browse your phone under the table, waiting until they finish speaking about irrelevant ideas.", value: "C", score: 1 },
-      { label: "Paraphrase their narrative briefly, then bridge back: 'That drive is why your current project has so much potential. Let's design the login flow...'", value: "D", score: 4 }
+      { label: "Paraphrase their narrative briefly, then bridge back: 'That drive is why your current project has so much potential. Let's design the heavy load floor capacity...'", value: "D", score: 4 }
     ]
   },
   {
@@ -237,13 +237,13 @@ export const quickQuestions: Question[] = [
     id: "q_cq_6",
     category: AssessmentCategory.CQ,
     subsection: "Communication Clarity",
-    text: "There is a dispute inside a project team email thread regarding code ownership. What is your intervention?",
+    text: "There is a dispute inside an project team email thread regarding subcontractor work zone boundaries on the construction site. What is your intervention?",
     context: "Workplace",
     options: [
-      { label: "Initiate a quick 10-minute huddle, map out clear swimlanes in a shared document, and close the thread with positive alignment.", value: "A", score: 5 },
-      { label: "Reply to everyone with a long, legally phrased email pointing out exactly who made what mistakes.", value: "B", score: 1 },
-      { label: "Take over the repository, rewrite the contested code yourself, and push it silently.", value: "C", score: 2 },
-      { label: "Call both developers separately to hear their personal perspectives before deciding the swimlanes.", value: "D", score: 4 }
+      { label: "Initiate a quick 10-minute site huddle, map out clear team work-zones on the physical blueprint, and close the thread with positive alignment.", value: "A", score: 5 },
+      { label: "Reply to everyone with a long, legally phrased email pointing out exactly who made what measurement errors.", value: "B", score: 1 },
+      { label: "Take over the partition layout, complete the wall settings yourself, and lock the site gates.", value: "C", score: 2 },
+      { label: "Call both crew heads separately to hear their personal perspectives before finalizing the property division line.", value: "D", score: 4 }
     ]
   },
 
@@ -265,24 +265,24 @@ export const quickQuestions: Question[] = [
     id: "q_per_2",
     category: AssessmentCategory.PERSONALITY,
     subsection: "Conscientiousness",
-    text: "You are setting setup protocols for your team's code documentation. How organized are you naturally?",
+    text: "You are establishing filing protocols for your team's building blueprints and material specifications. How organized are you naturally?",
     context: "Workplace",
     options: [
-      { label: "Extremely tidy. I follow clean folder guidelines, use strict linters, and document every API file thoroughly.", value: "A", score: 5 },
-      { label: "Highly flexible. I write clean code but documentation feels like a chore, so I only do it before major production launches.", value: "B", score: 3 },
-      { label: "Chaotic but functional. My workspace is messy, and I remember everything in my head, updating docs only if forced.", value: "C", score: 1 },
-      { label: "Iterative. I build working templates, keep a clear README, and trust automated comments to cover the rest.", value: "D", score: 4 }
+      { label: "Extremely tidy. I follow rigid schematic folder structures, catalog revision versions carefully, and archive safety specs for every major beam.", value: "A", score: 5 },
+      { label: "Highly flexible. I draw accurate designs, but compiling folder checklists is tedious, so I organize them systematically right before inspection visits.", value: "B", score: 3 },
+      { label: "Chaotic but functional. My blueprints are scattered in drawers or on my truck bed, yet I know every detail by heart.", value: "C", score: 1 },
+      { label: "Iterative. I maintain master structural layouts, keep clear checklists in my notebook, and rely on on-site foreman updates for minor info.", value: "D", score: 4 }
     ]
   },
   {
     id: "q_per_3",
     category: AssessmentCategory.PERSONALITY,
     subsection: "Extraversion",
-    text: "After a long week of intense, quiet analytical programming and accounting reviews, how do you recharge your energy?",
+    text: "After a long week of intense, quiet analytical blueprint layouts and accounting reviews, how do you recharge your energy?",
     context: "Social",
     options: [
       { label: "Quiet evening at home reading, gaming, or chilling with a simple movie.", value: "A", score: 2 },
-      { label: "Heading to a Yaba tech mixer, catching up with friends, and sharing cold drinks in Yaba.", value: "B", score: 5 },
+      { label: "Heading to a lively commercial real estate mixers, catching up with peers, and sharing cold drinks.", value: "B", score: 5 },
       { label: "A small, quiet dinner with 1 or 2 close childhood friends talking about long-term ideas.", value: "C", score: 4 },
       { label: "Sleeping for 12 hours straight without looking at any notifications.", value: "D", score: 1 }
     ]
@@ -291,26 +291,26 @@ export const quickQuestions: Question[] = [
     id: "q_per_4",
     category: AssessmentCategory.PERSONALITY,
     subsection: "Agreeableness",
-    text: "During an important design meeting, a teammate proposes a feature that is visually stunning but makes the mobile interface highly inaccessible. You:",
+    text: "During an important layout design meeting, a teammate proposes a feature that is visually stunning but makes the building's main entrance completely inaccessible for heavy deliveries or wheelchairs. You:",
     context: "Workplace",
     options: [
-      { label: "Acknowledge the aesthetic brilliance, show mockups demonstrating the friction points, and partner to redesign an elegant, accessible button.", value: "A", score: 5 },
-      { label: "Keep quiet to avoid hurting their feelings, allowing the inaccessible design into the production backlog.", value: "B", score: 2 },
-      { label: "Tell them flat out their design is bad practice and we must drop it immediately.", value: "C", score: 1 },
-      { label: "Recommend testing with real users to let external feedback settle the design choice.", value: "D", score: 4 }
+      { label: "Acknowledge the aesthetic brilliance, show sketches of the entry friction points, and partner to co-design an elegant entrance ramp.", value: "A", score: 5 },
+      { label: "Keep quiet to avoid hurting their feelings, allowing the inaccessible entryway into the final construction blueprints.", value: "B", score: 2 },
+      { label: "Tell them flat out their spatial design violates building codes and we must drop it immediately.", value: "C", score: 1 },
+      { label: "Recommend checking with a municipal site inspector to let external regulatory standards settle the layout choice.", value: "D", score: 4 }
     ]
   },
   {
     id: "q_per_5",
     category: AssessmentCategory.PERSONALITY,
     subsection: "Emotional Stability",
-    text: "When a sudden server crash or client dispute occurs in the middle of a high-stakes campaign, what is your gut response?",
+    text: "When a sudden structural material delivery delay or client dispute occurs in the middle of a high-stakes building phase, what is your gut response?",
     context: "Business",
     options: [
-      { label: "Take a deep breath, isolate the variables systematically in a status doc, and assign clear responsibilities.", value: "A", score: 5 },
-      { label: "Feel immense panic, immediately look for who to blame, and write defensive Slack updates.", value: "B", score: 1 },
-      { label: "Feel highly stressed but keep it in, working long, frantic hours to patch it up without coordination.", value: "C", score: 3 },
-      { label: "Comfort the team first: 'We will solve this, server errors are standard.' Then coordinate with engineering.", value: "D", score: 4 }
+      { label: "Take a deep breath, isolate the supply variables systematically in a status doc, and assign clear vendor coordination duties.", value: "A", score: 5 },
+      { label: "Feel immense panic, immediately look for who to blame, and write defensive alerts to the general manager.", value: "B", score: 1 },
+      { label: "Feel highly stressed but keep it in, working long, frantic hours to patch up the site supply without communication.", value: "C", score: 3 },
+      { label: "Comfort the crew first: 'We will solve this, delivery delays are standard on major phases.' Then coordinate with logistics.", value: "D", score: 4 }
     ]
   },
   {
@@ -345,33 +345,33 @@ export const quickQuestions: Question[] = [
     id: "q_lea_2",
     category: AssessmentCategory.LEADERSHIP,
     subsection: "Team Management",
-    text: "Your agritech project team is divided: engineers want to build a rich web portal, but field workers want SMS-based templates. You:",
+    text: "Your real estate development project team is divided: architectural consultants want to build full poured concrete partitions, but the field operations crew wants durable modular drywall framing. You:",
     context: "Business",
     options: [
-      { label: "Synthesize: build the robust database, expose a simple SMS-gateway broker for field workers, and host a simple web dashboard for executives.", value: "A", score: 5 },
-      { label: "Side with the engineers because writing modern web APIs is cooler for tech portfolios.", value: "B", score: 2 },
-      { label: "Force the field workers to adapt to smartphones, citing modern progress.", value: "C", score: 1 },
-      { label: "Set up a co-design session: have engineers visit the farms so they physically see why SMS is necessary.", value: "D", score: 4 }
+      { label: "Synthesize: build the reinforced concrete core structure, utilize durable modular framing for quick partition layout, and hold a unified site presentation.", value: "A", score: 5 },
+      { label: "Side with the architectural consultants because drawing complex poured concrete designs looks cooler in design portfolios.", value: "B", score: 2 },
+      { label: "Force the field workers to adapt to monolithic concrete forms, citing modern architecture progress.", value: "C", score: 1 },
+      { label: "Set up a site-design session: have the architects visit active field locations to physically see why modular components are quicker to install.", value: "D", score: 4 }
     ]
   },
   {
     id: "q_lea_3",
     category: AssessmentCategory.LEADERSHIP,
     subsection: "Decision Making",
-    text: "A project launch is scheduled for tomorrow at 8 AM. At 11 PM, you detect a minor UI bug that occurs only on older browsers. What is your call?",
+    text: "A commercial property grand opening is scheduled for tomorrow at 8 AM. At 11 PM during final walkthrough, you detect a minor cosmetic wall trim paint smudge on an upper back-hallway floor. What is your call?",
     context: "Workplace",
     options: [
-      { label: "Proceed with the launch. Document the bug, prepare a patch, and deploy it quietly during low-traffic hours tomorrow night.", value: "A", score: 5 },
-      { label: "Postpone the entire launch for 3 days to achieve a high-fidelity patch.", value: "B", score: 2 },
-      { label: "Demand the developers stay up all night fixing it, regardless of fatigue levels.", value: "C", score: 2 },
-      { label: "Alert customer support to have a pre-written canned response ready if older browser users write in, releasing on schedule.", value: "D", score: 4 }
+      { label: "Proceed with the opening. Document the cosmetic issue, and arrange for a handyman to touch it up tomorrow evening during low-traffic hours.", value: "A", score: 5 },
+      { label: "Postpone the entire opening for 3 days to achieve a pristine multi-coat repainting of the corridor.", value: "B", score: 2 },
+      { label: "Demand the painters stay up all night fixing it under heavy site floodlights, regardless of fatigue levels.", value: "C", score: 2 },
+      { label: "Alert site receptionists to direct guests through the main front atrium, releasing on schedule.", value: "D", score: 4 }
     ]
   },
   {
     id: "q_lea_4",
     category: AssessmentCategory.LEADERSHIP,
     subsection: "Influence & Clout",
-    text: "How do you align a diverse group of stakeholders (clients, field workers, local chiefs) with your community project?",
+    text: "How do you align a diverse group of stakeholders (clients, field builders, local chiefs) with your community real estate project?",
     context: "Workplace",
     options: [
       { label: "Personally visit regional leaders first to show cultural respect, then hold a town-hall illustrating direct economic benefits.", value: "A", score: 5 },
@@ -384,26 +384,26 @@ export const quickQuestions: Question[] = [
     id: "q_lea_5",
     category: AssessmentCategory.LEADERSHIP,
     subsection: "Team Management & Care",
-    text: "A highly productive developer on your team is getting critical peer feedback about their communication tone. You:",
+    text: "A highly productive site supervisor on your team is getting critical peer feedback about their communication tone with subcontractor crews. You:",
     context: "Workplace",
     options: [
-      { label: "Hold a private, friendly session. Praise their technical output, share specific tone examples, and suggest a 'review and edit' rule for messages.", value: "A", score: 5 },
-      { label: "Reprimand them publicly on Slack to establish standard team boundaries.", value: "B", score: 1 },
-      { label: "Ignore it since their code commits are stellar, and tell the others to ignore the tone.", value: "C", score: 2 },
-      { label: "Assign them a communications coaching course, and have them present a summary to the engineering team.", value: "D", score: 4 }
+      { label: "Hold a private, friendly session. Praise their project work-rate, share specific tone examples, and suggest an 'explain first, direct second' rule for instructions.", value: "A", score: 5 },
+      { label: "Reprimand them publicly on the main site WhatsApp channel to establish standard team boundaries.", value: "B", score: 1 },
+      { label: "Ignore it since their physical building timelines are pristine, and tell the others to ignore the tone.", value: "C", score: 2 },
+      { label: "Assign them a construction leadership workshop, and have them present a summary to the site management team.", value: "D", score: 4 }
     ]
   },
   {
     id: "q_lea_6",
     category: AssessmentCategory.LEADERSHIP,
     subsection: "Initiative",
-    text: "The company budget is tight, and you notice your office is leaking capital on duplicate chemical analysis SaaS subscriptions. You:",
+    text: "The company building budget is tight, and you notice your office is leaking capital on duplicate material testing and machinery leasing subscriptions. You:",
     context: "Workplace",
     options: [
-      { label: "Inventory all active software licenses, propose a consolidated workspace model to the CEO, and execute the cancelation.", value: "A", score: 5 },
-      { label: "Do nothing, assuming the finance manager is already auditing subscription lines.", value: "B", score: 2 },
-      { label: "Complain to coworkers that the executives are wasting resources on duplicate tools.", value: "C", score: 1 },
-      { label: "Ask your immediate lead if we have permission to doublecheck duplicate SaaS bills.", value: "D", score: 4 }
+      { label: "Inventory all active leasing agreements, propose a consolidated equipment and supply model to the CEO, and execute cancelations of duplicates.", value: "A", score: 5 },
+      { label: "Do nothing, assuming the finance manager is already auditing machinery lease sheets.", value: "B", score: 2 },
+      { label: "Complain to classmates that the executives are wasting money on duplicate earth-moving machinery contracts.", value: "C", score: 1 },
+      { label: "Ask your immediate lead if we have permission to audit equipment hire invoices.", value: "D", score: 4 }
     ]
   }
 ];
@@ -535,11 +535,11 @@ const extraQuestionsData: { category: AssessmentCategory, subsection: string, te
   {
     category: AssessmentCategory.EQ,
     subsection: "Empathy",
-    text: "A junior software analyst seems quiet and makes coding mistakes. You hear their family home in Nairobi was affected by heavy rains. You:",
+    text: "A junior construction estimator seems quiet and makes structural pricing calculation errors. You hear their family home in Nairobi was affected by heavy rains. You:",
     context: "Workplace",
     options: [
-      { label: "Meet privately, express genuine empathy, offer a 3-day paid relief break, and set up a plan to cover their operational tickets.", score: 5 },
-      { label: "Ask them why they didn't mention this earlier as an excuse for poor work.", score: 1 },
+      { label: "Meet privately, express genuine empathy, offer a 3-day paid relief break, and set up a plan to cover their bidding tickets.", score: 5 },
+      { label: "Ask them why they didn't mention this earlier as an excuse for poor calculations.", score: 1 },
       { label: "Quietly ignore their errors for now to avoid talking about private emotional topics.", score: 2 },
       { label: "Sponsor a community support drive in the firm, helping them organize temporary housing support.", score: 4 }
     ]
@@ -547,12 +547,12 @@ const extraQuestionsData: { category: AssessmentCategory, subsection: string, te
   {
     category: AssessmentCategory.EQ,
     subsection: "Relationship Management",
-    text: "A conflict breaks out between your marketing manager and lead engineer regarding product launch delay blame. You organize:",
+    text: "A conflict breaks out between your marketing manager and site project manager regarding commercial space handover delays. You organize:",
     context: "Workplace",
     options: [
-      { label: "A collaborative workshop focusing on transparent launch pipelines, setting shared timelines instead of pointing fingers.", score: 5 },
-      { label: "A formal disciplinary meeting where both present their written evidence of who made the mistake.", score: 2 },
-      { label: "Separate meetings to comfort them, then make the launch decision independently to save time.", score: 3 },
+      { label: "A collaborative workshop focusing on transparent construction stages, setting shared timelines instead of pointing fingers.", score: 5 },
+      { label: "A formal disciplinary meeting where both present their written evidence of who made the scheduling mistake.", score: 2 },
+      { label: "Separate meetings to comfort them, then make the delivery decisions independently to save time.", score: 3 },
       { label: "Construct an objective team SLA map where engineering timelines directly feed marketing campaign dates.", score: 4 }
     ]
   },
@@ -745,25 +745,25 @@ const extraQuestionsData: { category: AssessmentCategory, subsection: string, te
   {
     category: AssessmentCategory.LEADERSHIP,
     subsection: "Initiative",
-    text: "You notice the team is doing repetitive coordinate entry tasks manually, wasting 10 hours weekly. You:",
+    text: "You notice the site administration team is manually typing delivery bill of ladings into spreadsheets, wasting 10 hours weekly. You:",
     context: "Workplace",
     options: [
-      { label: "Spend 2 hours writing a secure python automation script and present it to the team to handle entries dynamically.", score: 5 },
-      { label: "Complain that manual data entry is boring and request a dedicated intern.", score: 1 },
-      { label: "Recommend looking for external automated tools during the next quarterly review meeting.", score: 3 },
-      { label: "Map the manual steps, test a simple free spreadsheet macro, and document the new, faster entry process.", score: 4 }
+      { label: "Spend 2 hours designing a simple digital intake form template that parses invoices and auto-populates ledger entries.", score: 5 },
+      { label: "Complain that manual data entry is boring and demand a dedicated scanning intern.", score: 1 },
+      { label: "Recommend looking for external automated software during the next quarterly review meeting.", score: 3 },
+      { label: "Map the manual steps, test a simple spreadsheet macro, and train the team on the new, faster entry process.", score: 4 }
     ]
   },
   {
     category: AssessmentCategory.LEADERSHIP,
     subsection: "Team Management",
-    text: "Your Nairobi fintech team misses a delivery milestone because of technical debt. You address the board with:",
+    text: "Your Nairobi commercial build project misses a phase finishing milestone because of structural material delays. You address the board with:",
     context: "Workplace",
     options: [
-      { label: "'The delivery failure was my oversight. We have structured a technical repayment plan over Sprint 4, ensuring delivery on July 10.'", score: 5 },
-      { label: "'Our engineering team lagged because Kenyan power outages affected remote servers. We need more budget.'", score: 1 },
-      { label: "'We delivered 80% of features anyway, so it's practically a soft success.'", score: 2 },
-      { label: "A transparent breakdown of our developer bottlenecks, explaining the specific legacy modules we are purging.", score: 4 }
+      { label: "'The schedule delay was my oversight. We have structured a supply-catchup schedule with our backup merchant, ensuring delivery on July 10.'", score: 5 },
+      { label: "'Our delivery trucks lagged because municipal traffic affected transit. We need more budget.'", score: 1 },
+      { label: "'We finished 80% of the walls anyway, so it's practically a successful phase handover.'", score: 2 },
+      { label: "A transparent breakdown of our material supply chain vulnerabilities, explaining the specific logistics steps we are restructuring.", score: 4 }
     ]
   },
   {
@@ -781,13 +781,13 @@ const extraQuestionsData: { category: AssessmentCategory, subsection: string, te
   {
     category: AssessmentCategory.LEADERSHIP,
     subsection: "Decision Making",
-    text: "A customer wants a custom, highly customized agritech deployment that requires 2 months of custom code. Your product is SaaS. You:",
+    text: "A client wants a highly specialized, customized architectural design that requires 2 months of unique fabrication. Your firm focuses on standardized modular builds. You:",
     context: "Business",
     options: [
-      { label: "Decline polite: 'We prioritize general scalable SaaS templates. Let's see how our existing API fits your current system.'", score: 5 },
-      { label: "Accept the deal immediately because it's a huge check, pausing all SaaS feature development for 2 months.", score: 2 },
+      { label: "Decline politely: 'We prioritize standardized high-efficiency modular presets. Let's see how our existing layouts fit your current property outline.'", score: 5 },
+      { label: "Accept the deal immediately because it's a huge check, pausing all standard modular assembly lines for 2 months.", score: 2 },
       { label: "Tell them you will build it, but charge them 10x the standard pricing hoping they walk away.", score: 3 },
-      { label: "Partner with an external Yaba integrations agency, licensing them our platform to deliver the custom service.", score: 4 }
+      { label: "Partner with an external bespoke architecture agency, referring the client's custom requests to them to deliver the customized fabrication.", score: 4 }
     ]
   }
 ];
