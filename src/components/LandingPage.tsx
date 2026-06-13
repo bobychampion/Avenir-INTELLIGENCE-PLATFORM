@@ -129,18 +129,6 @@ export default function LandingPage({
           },
           ...prev
         ]);
-
-        fetch("/api/save-image-generation", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            profession: genProfession,
-            style: genStyle,
-            customPrompt,
-            imageUrl,
-            userId: "anon"
-          })
-        }).catch(() => null);
       } else {
         throw new Error("Failed to produce static or generative travel imagery.");
       }

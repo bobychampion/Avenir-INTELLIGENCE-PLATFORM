@@ -41,21 +41,6 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
     setTimeout(() => setSuccessMsg(""), 3000);
   };
 
-  const persistQuestion = async (payload: any) => {
-    try {
-      const res = await fetch(payload.isEditing ? `/api/admin/questions/${payload.existingId}` : "/api/admin/questions", {
-        method: payload.isEditing ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) {
-        console.warn("Question persistence to Firestore did not complete successfully.");
-      }
-    } catch {
-      console.warn("Question persistence to Firestore failed.");
-    }
-  };
-
   const handleCreateOrUpdate = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -67,6 +52,7 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
     ];
 
     if (isEditing) {
+      // Update
       setQuestions(prev => prev.map(q => q.id === isEditing ? {
         ...q,
         text: questionText,
@@ -75,19 +61,10 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
         context: questionContext,
         options: formattedOptions
       } : q));
-      persistQuestion({
-        id: isEditing,
-        isEditing: true,
-        existingId: isEditing,
-        category: questionCategory,
-        text: questionText,
-        subsection: questionSubsection,
-        context: questionContext,
-        options: formattedOptions
-      });
       setIsEditing(null);
-      triggerSuccessMsg("Question updated successfully.");
+      triggerSuccessMsg("Question updated successfully inside working session memory.");
     } else {
+      // Create
       const newQ: Question = {
         id: "q_admin_" + Math.random().toString(36).substr(2, 9),
         category: questionCategory,
@@ -97,15 +74,6 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
         options: formattedOptions
       };
       setQuestions(prev => [newQ, ...prev]);
-      persistQuestion({
-        id: newQ.id,
-        isEditing: false,
-        category: questionCategory,
-        text: questionText,
-        subsection: questionSubsection,
-        context: questionContext,
-        options: formattedOptions
-      });
       triggerSuccessMsg("New custom question injected successfully.");
     }
 
@@ -134,12 +102,9 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
     setScoreD(q.options[3]?.score || 1);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     setQuestions(prev => prev.filter(q => q.id !== id));
     triggerSuccessMsg("Question deleted successfully.");
-    fetch(`/api/admin/questions/${encodeURIComponent(id)}`, {
-      method: "DELETE"
-    }).catch(() => {});
   };
 
   return (

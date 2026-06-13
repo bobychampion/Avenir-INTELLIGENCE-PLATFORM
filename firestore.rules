@@ -17,7 +17,7 @@ service cloud.firestore {
     }
     
     function isValidId(id) {
-       return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+       return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_-]+$');
     }
     
     function isAdmin() {
@@ -38,7 +38,7 @@ service cloud.firestore {
     // 1. User Profile validation helper
     function isValidUser(data) {
       return data.id is string && data.id.size() <= 128 &&
-             data.username is string && data.username.size() >= 2 && data.username.size() <= 200 &&
+             data.username is string && data.username.size() >= 1 && data.username.size() <= 200 &&
              data.email is string && data.email.size() <= 256 &&
              data.role is string && (data.role == "member" || data.role == "admin") &&
              data.createdAt is timestamp;
@@ -77,7 +77,8 @@ service cloud.firestore {
                       isValidId(userId) && 
                       isValidUser(incoming()) && 
                       incoming().id == userId &&
-                      incoming().createdAt == request.time &&
+                      incoming().createdAt is timestamp &&
+                      incoming().createdAt <= request.time &&
                       incoming().role == "member";
                       
       allow update: if isOwner(userId) && 
@@ -96,7 +97,8 @@ service cloud.firestore {
                         isValidId(assessmentId) && 
                         isValidAssessment(incoming()) && 
                         incoming().userId == userId &&
-                        incoming().createdAt == request.time;
+                        incoming().createdAt is timestamp &&
+                        incoming().createdAt <= request.time;
                         
         allow update, delete: if false; // immutable history entries
       }
@@ -108,7 +110,8 @@ service cloud.firestore {
                         isValidId(reportId) && 
                         isValidReport(incoming()) && 
                         incoming().userId == userId &&
-                        incoming().createdAt == request.time;
+                        incoming().createdAt is timestamp &&
+                        incoming().createdAt <= request.time;
                         
         allow update, delete: if false; // report records remain immutable
       }

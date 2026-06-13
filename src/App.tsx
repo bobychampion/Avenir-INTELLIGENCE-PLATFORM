@@ -16,6 +16,11 @@ import AdminPanel from "./components/AdminPanel";
 import AdminGateway from "./components/AdminGateway";
 import { generateReportClientSide } from "./lib/geminiFallback";
 
+// Real Firebase Auth & Firestore integrations
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { doc, getDoc, getDocs, collection, query, setDoc, serverTimestamp } from "firebase/firestore";
+import { auth, db, handleFirestoreError, OperationType } from "./lib/firebase";
+
 export default function App() {
   const { addToast } = useToast();
   // Routes State - sync with URL pathname
@@ -69,26 +74,138 @@ export default function App() {
     return () => window.removeEventListener("popstate", handleLocationChange);
   }, []);
 
-  // load user from localStorage if authenticated
-  useEffect(() => {
+  // Helper to fetch history logs from Cloud Firestore
+  const fetchUserHistoryFromFirestore = async (userId: string) => {
     try {
-      const savedUser = localStorage.getItem("avenir_auth_user");
-      const savedProfile = localStorage.getItem("avenir_auth_profile");
-      if (savedUser && savedProfile) {
-        const parsedUser = JSON.parse(savedUser);
-        const parsedProfile = JSON.parse(savedProfile);
-        setUser(parsedUser);
-        setProfile(parsedProfile);
-        
-        // Load history logs for this specific user
-        const savedHistory = localStorage.getItem(`avenir_history_${parsedUser.id}`);
-        if (savedHistory) {
-          setHistoryList(JSON.parse(savedHistory));
+      const assessmentsPath = `users/${userId}/assessments`;
+      const reportsPath = `users/${userId}/reports`;
+
+      const assessmentsSnap = await getDocs(collection(db, assessmentsPath));
+      const reportsSnap = await getDocs(collection(db, reportsPath));
+
+      const assessmentsMap = new Map<string, Assessment>();
+      assessmentsSnap.forEach((docSnap) => {
+        const data = docSnap.data();
+        assessmentsMap.set(data.id, {
+          id: data.id,
+          userId: data.userId,
+          type: data.type,
+          status: "completed",
+          responses: data.responses,
+          scores: data.scores,
+          completed_date: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString()
+        });
+      });
+
+      const history: { assessment: Assessment; report: AIReport }[] = [];
+      reportsSnap.forEach((docSnap) => {
+        const data = docSnap.data();
+        const relatedAssessment = assessmentsMap.get(data.assessmentId);
+        if (relatedAssessment) {
+          history.push({
+            assessment: relatedAssessment,
+            report: {
+              id: data.id,
+              assessment_id: data.assessmentId,
+              created_date: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+              personalSummary: data.personalSummary,
+              strengths: data.strengths || [],
+              weaknesses: data.weaknesses || [],
+              workStyle: data.workStyle || "",
+              careerSuggestions: data.careerSuggestions || [],
+              growthRecommendations: data.growthRecommendations || []
+            }
+          });
+        }
+      });
+
+      // Sort chronological descending
+      history.sort((a, b) => {
+        return new Date(b.assessment.completed_date || 0).getTime() - new Date(a.assessment.completed_date || 0).getTime();
+      });
+
+      setHistoryList(history);
+    } catch (err) {
+      console.error("Failed to load assessments from Firestore, trying local cache:", err);
+      const savedHistory = localStorage.getItem(`avenir_history_${userId}`);
+      if (savedHistory) {
+        setHistoryList(JSON.parse(savedHistory));
+      }
+    }
+  };
+
+  // actual Firebase Auth state trigger and session sync
+  useEffect(() => {
+    let active = true;
+    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+      if (fbUser) {
+        try {
+          const userDocRef = doc(db, "users", fbUser.uid);
+          const docSnap = await getDoc(userDocRef);
+          
+          let appUser: User;
+          let appProfile: AdultProfile;
+
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            appUser = {
+              id: fbUser.uid,
+              name: data.username || fbUser.displayName || fbUser.email?.split("@")[0] || "User",
+              email: fbUser.email || data.email || "",
+              role: data.role || "member",
+              created_at: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString()
+            };
+            appProfile = {
+              id: "profile_" + fbUser.uid,
+              user_id: fbUser.uid,
+              age_range: data.ageRange || "25-34",
+              profession: data.profession || "Entrepreneur",
+              country: data.country || "Nigeria"
+            };
+          } else {
+            appUser = {
+              id: fbUser.uid,
+              name: fbUser.displayName || fbUser.email?.split("@")[0] || "User",
+              email: fbUser.email || "",
+              role: "member",
+              created_at: new Date().toISOString()
+            };
+            appProfile = {
+              id: "profile_" + fbUser.uid,
+              user_id: fbUser.uid,
+              age_range: "25-34",
+              profession: "General Professional",
+              country: "Nigeria"
+            };
+          }
+
+          if (active) {
+            setUser(appUser);
+            setProfile(appProfile);
+
+            // Set local fallback cache
+            localStorage.setItem("avenir_auth_user", JSON.stringify(appUser));
+            localStorage.setItem("avenir_auth_profile", JSON.stringify(appProfile));
+
+            // Load histories
+            await fetchUserHistoryFromFirestore(fbUser.uid);
+          }
+        } catch (err) {
+          console.error("Auth session mount setup error:", err);
+        }
+      } else {
+        if (active) {
+          setUser(null);
+          setProfile(null);
+          setHistoryList([]);
         }
       }
-    } catch (err) {
-      console.error("Failed to load user session from localStorage:", err);
-    }
+    });
+
+    return () => {
+      active = false;
+      unsubscribe();
+    };
   }, []);
 
   // Sync route utility
@@ -104,19 +221,14 @@ export default function App() {
   };
 
   // Auth successful callback
-  const handleAuthSuccess = (simulatedUser: User, simulatedProfile: AdultProfile, isLogin: boolean) => {
+  const handleAuthSuccess = async (simulatedUser: User, simulatedProfile: AdultProfile, isLogin: boolean) => {
     setUser(simulatedUser);
     setProfile(simulatedProfile);
     localStorage.setItem("avenir_auth_user", JSON.stringify(simulatedUser));
     localStorage.setItem("avenir_auth_profile", JSON.stringify(simulatedProfile));
 
-    // Load any existing histories for this unique client
-    const savedHistory = localStorage.getItem(`avenir_history_${simulatedUser.id}`);
-    if (savedHistory) {
-      setHistoryList(JSON.parse(savedHistory));
-    } else {
-      setHistoryList([]);
-    }
+    // Force load the history from Cloud Firestore
+    await fetchUserHistoryFromFirestore(simulatedUser.id);
 
     if (isLogin) {
       addToast(
@@ -136,7 +248,12 @@ export default function App() {
     navigateTo("profile");
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.error("Firebase logout error:", err);
+    }
     localStorage.removeItem("avenir_auth_user");
     localStorage.removeItem("avenir_auth_profile");
     setUser(null);
@@ -267,8 +384,41 @@ export default function App() {
       setActiveScores(calculatedScores);
       setActiveReport(finalReport);
 
-      // Save to user history if authenticated
+      // Save to user history & Cloud Firestore if authenticated
       if (user) {
+        // Prepare database schemas
+        const dbAssessment = {
+          id: simulatedAssessment.id,
+          userId: user.id,
+          type: activeTestType,
+          responses: responses,
+          scores: calculatedScores,
+          createdAt: serverTimestamp()
+        };
+
+        const dbReport = {
+          id: finalReport.id,
+          assessmentId: simulatedAssessment.id,
+          userId: user.id,
+          personalSummary: finalReport.personalSummary || "",
+          strengths: finalReport.strengths || [],
+          weaknesses: finalReport.weaknesses || [],
+          workStyle: finalReport.workStyle || "",
+          careerSuggestions: finalReport.careerSuggestions || [],
+          growthRecommendations: finalReport.growthRecommendations || [],
+          createdAt: serverTimestamp()
+        };
+
+        const assessmentDocRef = doc(db, "users", user.id, "assessments", simulatedAssessment.id);
+        const reportDocRef = doc(db, "users", user.id, "reports", finalReport.id);
+
+        try {
+          await setDoc(assessmentDocRef, dbAssessment);
+          await setDoc(reportDocRef, dbReport);
+        } catch (fsErr) {
+          handleFirestoreError(fsErr, OperationType.CREATE, `users/${user.id}/assessments/${simulatedAssessment.id}`);
+        }
+
         const updatedHistory = [{ assessment: simulatedAssessment, report: finalReport }, ...historyList];
         setHistoryList(updatedHistory);
         localStorage.setItem(`avenir_history_${user.id}`, JSON.stringify(updatedHistory));
